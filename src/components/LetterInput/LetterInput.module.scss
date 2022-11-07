@@ -1,0 +1,26 @@
+.input {
+  border: unset;
+  font-size: 2em;
+  width: 2em;
+  padding: 0.5em;
+  border-bottom: white solid 2px;
+  background-color: #292929;
+  text-align: center;
+
+  &.correct {
+    background-color: rgb(0, 83, 0);
+    border: 2px white solid;
+  }
+
+  &.present-elsewhere {
+    background-color: rgb(110, 36, 179);
+  }
+
+  @media (max-width: 1024px) {
+    font-size: 1.7em;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1.2em;
+  }
+}

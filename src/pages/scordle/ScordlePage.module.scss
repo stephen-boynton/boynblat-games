@@ -1,0 +1,56 @@
+.container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+
+  > :first-child {
+    margin-right: 5em;
+
+    @media (max-width: 1024px) {
+      margin: 0;
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column-reverse;
+  }
+}
+
+.body {
+  display: flex;
+  justify-content: center;
+  margin-top: 55px;
+}
+
+.input-row-container {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  > :not(:first-child) {
+    margin-top: 0.8em;
+  }
+
+  @media (min-width: 1024px) {
+    justify-content: center;
+    padding: 0.5rem;
+  }
+}
+
+.info-section {
+  padding-top: 7em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 50px;
+
+  @media (max-width: 1024) {
+    padding: 0;
+  }
+
+  @media (max-width: 768px) {
+    padding: 0;
+    flex-direction: row;
+  }
+}

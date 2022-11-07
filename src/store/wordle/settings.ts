@@ -1,0 +1,5 @@
+export default {
+  TIME_PER_GAME_IN_SEC: 120,
+  NUMBER_OF_ROUNDS: 6,
+  POINTS_PER_ROUND: [500, 250, 125, 62, 31, 15],
+}

@@ -1,0 +1,33 @@
+.container {
+  height: 300px;
+  width: 300px;
+  padding: 0.2em;
+
+  @media (max-width: 1024px) {
+    height: 150px;
+    width: 175px;
+    padding: 0.5em;
+  }
+}
+
+.heading {
+  font-size: 1.5em;
+
+  @media (max-width: 1024px) {
+    font-size: 1em;
+  }
+}
+
+.font {
+  font-size: 1.5em;
+  display: flex;
+  flex-wrap: wrap;
+
+  @media (max-width: 1024px) {
+    font-size: 1em;
+  }
+
+  > span {
+    margin: 0 0.2em;
+  }
+}

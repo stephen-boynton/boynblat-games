@@ -1,0 +1,16 @@
+.font {
+  font-size: 1.4em;
+  color: black;
+}
+
+.button {
+  background-color: green;
+  font-size: 1.4em;
+  padding: 10px;
+  width: 100px;
+  border: 2px solid black;
+
+  &:hover {
+    background-color: forestgreen;
+  }
+}
