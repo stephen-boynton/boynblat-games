@@ -4,6 +4,8 @@ import { useWordleState } from '../../store/wordle'
 import { GAME_STATE } from '../../store/wordle/types'
 import { LetterInput } from '../LetterInput'
 import styles from './InputRow.module.scss'
+import words from '../../words.json'
+import toast from 'react-hot-toast'
 
 const LETTER_COUNT = ['first', 'second', 'third', 'fourth', 'fifth']
 
@@ -57,7 +59,12 @@ export const InputRow = ({ row, isCurrentRound }) => {
     }
 
     if (e.key === 'Enter' && hasFullInput) {
-      endRound(userInput)
+      const guessedWord = Object.values(userInput).join('').toLowerCase()
+      if (words.includes(guessedWord)) {
+        endRound(userInput)
+      } else {
+        toast.error('Your guess is not on the word list')
+      }
     }
   }
 

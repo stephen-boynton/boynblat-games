@@ -9,6 +9,7 @@ import { StartModal } from '../../components/StartModal'
 import { Timer } from '../../components/Timer'
 import words from '../../words.json'
 import { GAME_STATE } from '../../store/wordle/types'
+import { Toaster } from 'react-hot-toast'
 
 const ROUND_COUNT = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
 const gameWord = words[Math.floor(Math.random() * words.length)]
@@ -30,7 +31,16 @@ export default function Home() {
   }
 
   useEffect(() => {
+    const isFirstRound = currentRound === 1
     const isFinalRound = currentRound === ROUND_COUNT.length
+    if (currentGameState === GAME_STATE.GAME_START && isFirstRound) {
+      const firstInput = document.querySelector(
+        `#row-${currentRound - 1}-input-0`
+      )
+
+      ;(firstInput as HTMLInputElement)?.focus()
+    }
+
     if (currentGameState === GAME_STATE.BETWEEN_ROUNDS) {
       if (!isFinalRound) {
         const nextRoundFirstInput = document.querySelector(
@@ -67,6 +77,7 @@ export default function Home() {
         </section>
       </div>
       <StartModal isOpen={isOpen} onClose={onClose} />
+      <Toaster />
     </section>
   )
 }
