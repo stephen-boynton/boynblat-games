@@ -1,13 +1,33 @@
-import React, { FormEvent, KeyboardEvent, useRef } from 'react'
+import React, { KeyboardEvent, useRef } from 'react'
 import { useState } from 'react'
-import { useWordleState } from '../../store/wordle'
-import { GAME_STATE } from '../../store/wordle/types'
+import {
+  useGame,
+  useGameScore,
+  usePlayerGuesses,
+  useSession,
+  useSessionScore,
+  useStatusMaps,
+} from '../../store/scordle'
+import { GAME_STATE } from '../../store/scordle/types'
 import { LetterInput } from '../LetterInput'
 import styles from './InputRow.module.scss'
 import words from '../../words.json'
 import toast from 'react-hot-toast'
+import { closeOutRound } from './utils'
+import { handleInput } from './handlers'
+import settings from '../../store/scordle/settings'
 
 const LETTER_COUNT = ['first', 'second', 'third', 'fourth', 'fifth']
+
+const getInputValue = ({
+  isCurrentRound,
+  userInput,
+  userGuesses,
+  index,
+  currentRound,
+}) => {
+  return isCurrentRound ? userInput[index] : userGuesses[currentRound]?.[index]
+}
 
 export const InputRow = ({ row, isCurrentRound }) => {
   const [userInput, setUserInput] = useState({
@@ -17,6 +37,7 @@ export const InputRow = ({ row, isCurrentRound }) => {
     3: '',
     4: '',
   })
+
   const firstRef = useRef<HTMLInputElement>(null)
   const secondRef = useRef<HTMLInputElement>(null)
   const thirdRef = useRef<HTMLInputElement>(null)
@@ -30,24 +51,24 @@ export const InputRow = ({ row, isCurrentRound }) => {
     3: fourthRef,
     4: fifthRef,
   }
+  const { userGuesses, setGuess } = usePlayerGuesses()
+  const { setNewGame, currentGameNumber } = useSession()
 
-  const { endRound, statusMaps, currentGameState } = useWordleState()
+  const {
+    currentGameState,
+    currentRound,
+    setGameState,
+    startNextRound,
+    wordMap,
+  } = useGame()
+
+  const { setStatusMaps, gameStatusMap, statusMaps } = useStatusMaps()
+  const { setRoundScore } = useGameScore()
+  const { setSessionScore } = useSessionScore()
 
   const isGameOver = currentGameState === GAME_STATE.GAME_END
   const hasFullInput =
     Object.values(userInput).filter((input) => input).length === 5
-
-  const handleInput = (index: number) => (e: FormEvent<HTMLInputElement>) => {
-    const value = (e.target as HTMLInputElement).value?.toUpperCase()
-    const nextTarget: React.RefObject<HTMLInputElement> | undefined =
-      refMap[index + 1]
-
-    setUserInput((state) => ({ ...state, [index]: value }))
-
-    if (value && nextTarget && nextTarget.current) {
-      nextTarget.current.focus()
-    }
-  }
 
   const handleKeyPress = (index: number) => (e: KeyboardEvent) => {
     if (e.key === 'Backspace') {
@@ -61,7 +82,27 @@ export const InputRow = ({ row, isCurrentRound }) => {
     if (e.key === 'Enter' && hasFullInput) {
       const guessedWord = Object.values(userInput).join('').toLowerCase()
       if (words.includes(guessedWord)) {
-        endRound(userInput)
+        const { score, statusMap, newGameStatusMap, isGameOver } =
+          closeOutRound({
+            userInput,
+            wordMap,
+            currentRound,
+            gameStatusMap,
+          })
+
+        setGuess(userInput, Object.values(userInput))
+        setRoundScore(score)
+        setStatusMaps(statusMap, newGameStatusMap)
+
+        if (isGameOver) {
+          if (currentGameNumber < settings.NUMBER_OF_GAMES_PER_DAY) {
+            setNewGame()
+          }
+          setSessionScore(score)
+          setGameState(GAME_STATE.GAME_END)
+        } else {
+          startNextRound()
+        }
       } else {
         toast.error('Your guess is not on the word list')
       }
@@ -73,13 +114,19 @@ export const InputRow = ({ row, isCurrentRound }) => {
       {LETTER_COUNT.map((letter, index) => (
         <LetterInput
           displayState={statusMaps[row]?.[index]}
-          handleInput={handleInput(index)}
+          handleInput={handleInput(refMap, setUserInput, index)}
           handleKeypress={handleKeyPress(index)}
           key={letter}
           readonly={!isCurrentRound && !isGameOver}
           ref={refMap[index]}
           selectorId={`row-${row}-input-${index}`}
-          value={userInput[index]}
+          value={getInputValue({
+            userInput,
+            isCurrentRound,
+            currentRound,
+            index,
+            userGuesses,
+          })}
         />
       ))}
     </div>

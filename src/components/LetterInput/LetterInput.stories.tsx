@@ -1,10 +1,10 @@
 import { LetterInput } from './index'
 import { action } from '@storybook/addon-actions'
-import { GUESS_STATE } from '../../store/wordle/types'
+import { GUESS_STATE } from '../../store/scordle/types'
 
 export default {
   component: LetterInput,
-  title: 'Scordle|Letter Input',
+  title: 'Scordle/Letter Input',
   controls: {
     displayState: {
       type: 'select',

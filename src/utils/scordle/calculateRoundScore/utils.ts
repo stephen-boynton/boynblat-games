@@ -1,12 +1,12 @@
 import uniq from 'lodash.uniq'
-import settings from '../../settings'
+import settings from '../../../store/scordle/settings'
 import {
   GAME_STATE,
   GUESS_STATE,
   StatusMap,
   WordleState,
   WordMap,
-} from '../../types'
+} from '../../../store/scordle/types'
 
 const isLetterPresentElsewhere = ({
   currentIndex,
@@ -128,33 +128,6 @@ export const buildCalcHelper = ({
     userInput,
   }
 }
-
-export const calculateScore = ({
-  roundStatusMap,
-  fullPoints,
-  halfPoints,
-  gameStatusMap,
-  currentRoundIndex,
-}: {
-  roundStatusMap: StatusMap
-  fullPoints: number
-  halfPoints: number
-  gameStatusMap: StatusMap
-  currentRoundIndex: number
-}): number =>
-  Object.values(roundStatusMap).reduce((acc, guessStatus, index) => {
-    if (
-      guessStatus === GUESS_STATE.CORRECT &&
-      !(gameStatusMap[index] === GUESS_STATE.CORRECT)
-    )
-      return acc + fullPoints + settings.POINTS_PER_ROUND[currentRoundIndex]
-    if (
-      guessStatus === GUESS_STATE.LETTER_IS_PRESENT &&
-      !(gameStatusMap[index] === GUESS_STATE.LETTER_IS_PRESENT)
-    )
-      return acc + halfPoints + settings.POINTS_PER_ROUND[currentRoundIndex] / 2
-    return acc
-  }, 0)
 
 export const buildGameStatusMap = ({
   gameStatusMap,

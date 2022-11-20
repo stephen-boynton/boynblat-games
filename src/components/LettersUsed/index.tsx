@@ -1,9 +1,9 @@
 import React from 'react'
-import { useWordleState } from '../../store/wordle'
+import { usePlayerGuesses } from '../../store/scordle'
 import styles from './LettersUsed.module.scss'
 
 export const LettersUsed = () => {
-  const lettersUsed = useWordleState((state) => state.lettersUsed)
+  const { lettersUsed } = usePlayerGuesses()
   return (
     <div className={styles.container}>
       <h2 className={styles.heading}>Letters Attempted</h2>

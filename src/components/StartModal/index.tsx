@@ -1,52 +1,78 @@
 import React from 'react'
 import Modal from 'react-modal'
-import { useWordleState } from '../../store/wordle'
-import { GAME_STATE } from '../../store/wordle/types'
+import {
+  useGame,
+  useGameSummary,
+  useSession,
+  useWords,
+} from '../../store/scordle'
+import settings from '../../store/scordle/settings'
+import { GAME_STATE, SESSION_STATE } from '../../store/scordle/types'
+import { ScoreTable } from './ScoreTable'
 import style from './StartModal.module.scss'
 
 Modal.setAppElement('#modal-root')
 
-const StartContent = ({ startGame, onClose }) => (
+const StartContent = ({
+  word,
+  startGame,
+  currentRound,
+  onClose,
+  session,
+  rounds = [],
+}) => (
   <div className={style['content-container']}>
     <h2 className={style.heading}>Welcome to Scordle</h2>
     <p className={style.description}>November 8, 2022</p>
-    <p className={style.font}>Round: 1 of 3</p>
+    <p className={style.font}>
+      Round: {session + 1} of {settings.NUMBER_OF_GAMES_PER_DAY}
+    </p>
+    <ScoreTable
+      currentRound={currentRound + 1}
+      rounds={rounds}
+      totalRounds={settings.NUMBER_OF_GAMES_PER_DAY}
+    />
     <button
       className={style.button}
       onClick={(e) => {
         e.preventDefault()
-        startGame()
+        startGame(word)
         onClose()
       }}
     >
-      Start!
+      {session > 1 ? 'Continue' : 'Start'}
+    </button>
+  </div>
+)
+
+const GameOverContent = ({ todaysWordRaw, gameScore, onClose }) => (
+  <div className={style['content-container']}>
+    <p className={style.font}>Game Over!</p>
+    <p className={style.font}>Today&apos;s word was: {todaysWordRaw}!</p>
+    <p className={style.font}>Your game score is: {gameScore}!</p>
+    <button
+      className={style.button}
+      onClick={(e) => {
+        e.preventDefault()
+        // startGame()
+        onClose()
+      }}
+    >
+      Ok
     </button>
   </div>
 )
 
 export const StartModal = ({ onClose, isOpen }) => {
-  const { startGame, currentGameState, todaysWordRaw, gameScore } =
-    useWordleState()
+  const { currentSessionState, sessionScore, currentGameNumber } = useSession()
+  const { words } = useWords()
+  const { currentRound, setWord, setGameState } = useGame()
+  const { gameSummaries } = useGameSummary()
 
-  const isGameOver = currentGameState === GAME_STATE.GAME_END
-
-  const GameOverContent = () => (
-    <div className={style['content-container']}>
-      <p className={style.font}>Game Over!</p>
-      <p className={style.font}>Today&apos;s word was: {todaysWordRaw}!</p>
-      <p className={style.font}>Your game score is: {gameScore}!</p>
-      <button
-        className={style.button}
-        onClick={(e) => {
-          e.preventDefault()
-          // startGame()
-          onClose()
-        }}
-      >
-        Ok
-      </button>
-    </div>
-  )
+  const startGame = (word: string) => {
+    setWord(word)
+    setGameState(GAME_STATE.GAME_START)
+  }
   return (
     <Modal
       isOpen={isOpen}
@@ -55,21 +81,30 @@ export const StartModal = ({ onClose, isOpen }) => {
           backgroundColor: 'rgba(1,1,1,0.7)',
         },
         content: {
+          position: 'absolute',
           backgroundColor: '#292929',
+          margin: '0 auto',
           padding: '50px',
-          top: '50%',
-          left: '50%',
-          right: 'auto',
-          bottom: 'auto',
-          marginRight: '-50%',
-          transform: 'translate(-50%, -50%)',
+          width: '600px',
+          height: '600px',
         },
       }}
     >
-      {isGameOver ? (
-        <GameOverContent />
+      {currentSessionState === SESSION_STATE.ENDED ? (
+        <GameOverContent
+          gameScore={sessionScore}
+          onClose={onClose}
+          todaysWordRaw={words.join(', ')}
+        />
       ) : (
-        <StartContent onClose={onClose} startGame={startGame} />
+        <StartContent
+          currentRound={currentRound}
+          onClose={onClose}
+          rounds={gameSummaries}
+          session={currentGameNumber}
+          startGame={startGame}
+          word={words[currentRound]}
+        />
       )}
     </Modal>
   )

@@ -1,15 +1,16 @@
 import React from 'react'
-import { useWordleState } from '../../store/wordle'
+import { useGameScore, useSessionScore } from '../../store/scordle'
 import styles from './ScoreCard.module.scss'
 
 export const ScoreCard = () => {
-  const gameScore = useWordleState((state) => state.gameScore)
+  const { totalGameScore } = useGameScore()
+  const { totalSessionScore } = useSessionScore()
   return (
     <div className={styles.container}>
       <h2 className={styles.heading}>ScoreCard</h2>
       <hr />
-      <p className={styles.font}>Game Score: {gameScore}</p>
-      <p className={styles.font}>Global Score: 00</p>
+      <p className={styles.font}>Game Score: {totalGameScore}</p>
+      <p className={styles.font}>Global Score: {totalSessionScore}</p>
     </div>
   )
 }

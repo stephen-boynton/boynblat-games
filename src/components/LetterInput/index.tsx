@@ -1,5 +1,5 @@
 import React, { FormEvent, KeyboardEvent } from 'react'
-import { GUESS_STATE } from '../../store/wordle/types'
+import { GUESS_STATE } from '../../store/scordle/types'
 import styles from './LetterInput.module.scss'
 import { selectFromClassMap } from './utils'
 

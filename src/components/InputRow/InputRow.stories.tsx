@@ -3,7 +3,7 @@ import { InputRow } from './index'
 
 export default {
   component: InputRow,
-  title: 'Scordle|Input Row',
+  title: 'Scordle/Input Row',
 }
 
 export const Main = () => {

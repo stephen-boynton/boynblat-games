@@ -4,72 +4,56 @@ import styles from './ScordlePage.module.scss'
 import { InputRow } from '../../components/InputRow'
 import { LettersUsed } from '../../components/LettersUsed'
 import { ScoreCard } from '../../components/ScoreCard'
-import { useWordleState } from '../../store/wordle'
+import {
+  useGame,
+  usePlayerGuesses,
+  useSession,
+  useWords,
+} from '../../store/scordle'
 import { StartModal } from '../../components/StartModal'
 import { Timer } from '../../components/Timer'
-import words from '../../words.json'
-import { GAME_STATE } from '../../store/wordle/types'
+import { GAME_STATE } from '../../store/scordle/types'
 import { Toaster } from 'react-hot-toast'
+import words from '../../words.json'
+import { InputTable } from '../../components/InputTable'
 
-const ROUND_COUNT = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
-const gameWord = words[Math.floor(Math.random() * words.length)]
+const gameWord1 = words[Math.floor(Math.random() * words.length)].toUpperCase()
+const gameWord2 = words[Math.floor(Math.random() * words.length)].toUpperCase()
+const gameWord3 = words[Math.floor(Math.random() * words.length)].toUpperCase()
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(true)
-  const getTodaysWord = useWordleState((state) => state.getTodaysWord)
+  const { currentGameState, resetGame } = useGame()
+  const { words, setWords } = useWords()
+  const { reset: resetGuesses } = usePlayerGuesses()
 
-  const currentRound = useWordleState((state) => state.currentRound)
-  const currentGameState = useWordleState((state) => state.currentGameState)
-  const calculateRoundScore = useWordleState(
-    (state) => state.calculateRoundScore
-  )
+  const resetState = () => {
+    resetGuesses()
+    resetGame()
+    setIsOpen(true)
+  }
 
-  getTodaysWord(gameWord.toUpperCase())
+  useEffect(() => {
+    if (!words.length) {
+      console.log('new words run deep')
+      setWords([gameWord1, gameWord2, gameWord3])
+    }
+  }, [words])
+
+  useEffect(() => {
+    if (currentGameState === GAME_STATE.GAME_END) {
+      setTimeout(resetState, 2000)
+    }
+  }, [currentGameState])
 
   const onClose = () => {
     setIsOpen(false)
   }
-
-  useEffect(() => {
-    const isFirstRound = currentRound === 1
-    const isFinalRound = currentRound === ROUND_COUNT.length
-    if (currentGameState === GAME_STATE.GAME_START && isFirstRound) {
-      const firstInput = document.querySelector(
-        `#row-${currentRound - 1}-input-0`
-      )
-
-      ;(firstInput as HTMLInputElement)?.focus()
-    }
-
-    if (currentGameState === GAME_STATE.BETWEEN_ROUNDS) {
-      if (!isFinalRound) {
-        const nextRoundFirstInput = document.querySelector(
-          `#row-${currentRound}-input-0`
-        )
-
-        ;(nextRoundFirstInput as HTMLInputElement)?.focus()
-      }
-
-      calculateRoundScore()
-    }
-    if (currentGameState === GAME_STATE.GAME_END) {
-      setIsOpen(true)
-    }
-  }, [currentGameState])
-
   return (
     <section className={styles.container} id="modal-root">
       <Header />
       <div className={styles.body}>
-        <div className={styles['input-row-container']}>
-          {ROUND_COUNT.map((round, index) => (
-            <InputRow
-              isCurrentRound={currentRound - 1 === index}
-              key={round}
-              row={index}
-            />
-          ))}
-        </div>
+        <InputTable />
         <section className={styles['info-section']}>
           <Timer />
           <LettersUsed />

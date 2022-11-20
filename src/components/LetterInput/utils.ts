@@ -1,4 +1,4 @@
-import { GUESS_STATE } from '../../store/wordle/types'
+import { GUESS_STATE } from '../../store/scordle/types'
 
 export const selectFromClassMap = (displayStage, style) => {
   const selectorMap = {

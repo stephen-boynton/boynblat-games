@@ -1,8 +1,8 @@
 import React from 'react'
 import { useEffect } from 'react'
 import { useTimer } from 'react-timer-hook'
-import { useWordleState } from '../../store/wordle'
-import { GAME_STATE } from '../../store/wordle/types'
+import { useGame, useTimeStamp } from '../../store/scordle'
+import { GAME_STATE } from '../../store/scordle/types'
 import style from './Timer.module.scss'
 
 const formatSeconds = (seconds: number) => {
@@ -24,9 +24,8 @@ export const Timer = () => {
     autoStart: false,
   })
 
-  const currentGameState = useWordleState((state) => state.currentGameState)
-  const setTimeStamp = useWordleState((state) => state.setTimeStamp)
-  const setGameOver = useWordleState((state) => state.setGameOver)
+  const { currentGameState, setGameState } = useGame()
+  const { setTimeStamp } = useTimeStamp()
 
   const isGameStarted = currentGameState === GAME_STATE.GAME_START
   const isCurrentRoundOver = currentGameState === GAME_STATE.BETWEEN_ROUNDS
@@ -41,9 +40,9 @@ export const Timer = () => {
 
   useEffect(() => {
     if (minutes === 0 && seconds === 0) {
-      setGameOver()
+      setGameState(GAME_STATE.GAME_END)
     }
-  })
+  }, [seconds])
 
   return (
     <div>

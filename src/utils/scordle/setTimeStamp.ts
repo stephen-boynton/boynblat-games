@@ -1,4 +1,4 @@
-import { TimeStamp, WordleState } from '../types'
+import { TimeStamp, WordleState } from '../../store/scordle/types'
 
 export const setTimeStamp = (set) => (timeStamp: TimeStamp) => {
   set(

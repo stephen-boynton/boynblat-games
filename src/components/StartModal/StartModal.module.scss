@@ -1,16 +1,8 @@
 .content-container {
-  height: 200px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-
-  > :first-child {
-    margin-bottom: 10px;
-  }
-
-  > :nth-child(3) {
-    margin: 50px 0;
-  }
+  justify-content: space-between;
+  height: 100%;
 }
 
 .heading {
@@ -41,10 +33,46 @@
   background-color: green;
   font-size: 1.4em;
   padding: 10px;
-  width: 100px;
   border: none;
 
   &:hover {
     background-color: forestgreen;
+    cursor: pointer;
+  }
+}
+
+.table {
+  font-size: 1.4em;
+  border: white 1px;
+  display: flex;
+  flex-direction: column;
+  align-items: space-between;
+  color: gray;
+  min-width: 400px;
+  margin: 20px 0;
+
+  > :first-child {
+    color: white;
+    border-bottom: 2px solid white;
+    font-weight: normal;
+  }
+
+  > tr {
+    display: flex;
+    justify-content: center;
+
+    &.current {
+      color: white;
+    }
+
+    > :not(:last-child) {
+      border-right: 1px solid white;
+    }
+
+    > td, th {
+      width: 100%;
+      text-align: center;
+      padding: 10px;
+    }
   }
 }

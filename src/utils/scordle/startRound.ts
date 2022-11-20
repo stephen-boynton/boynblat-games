@@ -1,4 +1,4 @@
-import { GAME_STATE, WordleState } from '../types'
+import { GAME_STATE, WordleState } from '../../store/scordle/types'
 
 export const startRound = (set) => () => {
   set(
