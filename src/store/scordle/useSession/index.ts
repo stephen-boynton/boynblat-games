@@ -6,20 +6,15 @@ type UseSession = {
   currentGameNumber: number
   currentSessionState: SESSION_STATE
   gamesLeft: number
-  gameScores: number[]
-  sessionScore: number
   endSession: () => void
   setNewGame: () => void
   setCurrentSessionState: (sessionState: SESSION_STATE) => void
-  setScore: (score: number) => void
 }
 
 export const useSession = create<UseSession>((set) => ({
   currentGameNumber: 0,
   currentSessionState: SESSION_STATE.ACTIVE,
   gamesLeft: settings.NUMBER_OF_GAMES_PER_DAY,
-  gameScores: [],
-  sessionScore: 0,
   endSession: () => {
     set((state) => ({
       ...state,
@@ -37,13 +32,6 @@ export const useSession = create<UseSession>((set) => ({
     set((state) => ({
       ...state,
       currentSessionState: sessionState,
-    }))
-  },
-  setScore: (score: number) => {
-    set((state) => ({
-      ...state,
-      gameScores: [...state.gameScores, score],
-      sessionScore: state.sessionScore + score,
     }))
   },
 }))

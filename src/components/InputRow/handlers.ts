@@ -6,7 +6,7 @@ export const handleInput =
     const nextTarget: React.RefObject<HTMLInputElement> | undefined =
       refMap[index + 1]
 
-    setUserInput((state) => ({ ...state, [index]: value }))
+    setUserInput(index, value)
 
     if (value && nextTarget && nextTarget.current) {
       nextTarget.current.focus()

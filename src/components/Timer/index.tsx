@@ -19,7 +19,7 @@ export enum TIMER_EVENT {
 export const Timer = () => {
   const expiryTimestamp = new Date()
   expiryTimestamp.setMinutes(expiryTimestamp.getMinutes() + 2)
-  const { start, pause, seconds, minutes } = useTimer({
+  const { pause, seconds, minutes, restart } = useTimer({
     expiryTimestamp,
     autoStart: false,
   })
@@ -28,14 +28,16 @@ export const Timer = () => {
   const { setTimeStamp } = useTimeStamp()
 
   const isGameStarted = currentGameState === GAME_STATE.GAME_START
-  const isCurrentRoundOver = currentGameState === GAME_STATE.BETWEEN_ROUNDS
   const isGameOver = currentGameState === GAME_STATE.GAME_END
 
   useEffect(() => {
-    if (isGameStarted) start()
-    if (isGameOver) pause()
-    if (isCurrentRoundOver)
+    if (isGameStarted) {
+      restart(expiryTimestamp)
+    }
+    if (isGameOver) {
+      pause()
       setTimeStamp({ minutes, seconds, event: TIMER_EVENT.ROUND_START })
+    }
   }, [currentGameState])
 
   useEffect(() => {

@@ -4,6 +4,7 @@ import {
   useGame,
   useGameSummary,
   useSession,
+  useSessionScore,
   useWords,
 } from '../../store/scordle'
 import settings from '../../store/scordle/settings'
@@ -19,7 +20,7 @@ const StartContent = ({
   currentRound,
   onClose,
   session,
-  rounds = [],
+  games = [],
 }) => (
   <div className={style['content-container']}>
     <h2 className={style.heading}>Welcome to Scordle</h2>
@@ -29,7 +30,7 @@ const StartContent = ({
     </p>
     <ScoreTable
       currentRound={currentRound + 1}
-      rounds={rounds}
+      games={games}
       totalRounds={settings.NUMBER_OF_GAMES_PER_DAY}
     />
     <button
@@ -64,10 +65,13 @@ const GameOverContent = ({ todaysWordRaw, gameScore, onClose }) => (
 )
 
 export const StartModal = ({ onClose, isOpen }) => {
-  const { currentSessionState, sessionScore, currentGameNumber } = useSession()
+  const { currentSessionState, currentGameNumber } = useSession()
+  const { totalSessionScore } = useSessionScore()
   const { words } = useWords()
   const { currentRound, setWord, setGameState } = useGame()
   const { gameSummaries } = useGameSummary()
+
+  console.log({ words })
 
   const startGame = (word: string) => {
     setWord(word)
@@ -92,18 +96,18 @@ export const StartModal = ({ onClose, isOpen }) => {
     >
       {currentSessionState === SESSION_STATE.ENDED ? (
         <GameOverContent
-          gameScore={sessionScore}
+          gameScore={totalSessionScore}
           onClose={onClose}
           todaysWordRaw={words.join(', ')}
         />
       ) : (
         <StartContent
           currentRound={currentRound}
+          games={gameSummaries}
           onClose={onClose}
-          rounds={gameSummaries}
           session={currentGameNumber}
           startGame={startGame}
-          word={words[currentRound]}
+          word={words[currentGameNumber]}
         />
       )}
     </Modal>

@@ -3,10 +3,12 @@ import { useState } from 'react'
 import {
   useGame,
   useGameScore,
+  useGameSummary,
   usePlayerGuesses,
   useSession,
   useSessionScore,
   useStatusMaps,
+  useTimeStamp,
 } from '../../store/scordle'
 import { GAME_STATE } from '../../store/scordle/types'
 import { LetterInput } from '../LetterInput'
@@ -24,20 +26,21 @@ const getInputValue = ({
   userInput,
   userGuesses,
   index,
-  currentRound,
+  row,
 }) => {
-  return isCurrentRound ? userInput[index] : userGuesses[currentRound]?.[index]
+  const historicValue = userGuesses[row]?.[index]
+
+  if (isCurrentRound) {
+    // use local state for current round
+    return userInput[index]
+  }
+
+  if (historicValue) return historicValue
+
+  return ''
 }
 
 export const InputRow = ({ row, isCurrentRound }) => {
-  const [userInput, setUserInput] = useState({
-    0: '',
-    1: '',
-    2: '',
-    3: '',
-    4: '',
-  })
-
   const firstRef = useRef<HTMLInputElement>(null)
   const secondRef = useRef<HTMLInputElement>(null)
   const thirdRef = useRef<HTMLInputElement>(null)
@@ -51,8 +54,15 @@ export const InputRow = ({ row, isCurrentRound }) => {
     3: fourthRef,
     4: fifthRef,
   }
-  const { userGuesses, setGuess } = usePlayerGuesses()
+  const { userGuesses, setGuess, setLettersUsed } = usePlayerGuesses()
   const { setNewGame, currentGameNumber } = useSession()
+
+  const userInput = userGuesses[row]
+
+  const setUserInput = (index, value) => {
+    const newUserInput = { ...userInput, [index]: value }
+    setGuess(newUserInput, row)
+  }
 
   const {
     currentGameState,
@@ -65,6 +75,8 @@ export const InputRow = ({ row, isCurrentRound }) => {
   const { setStatusMaps, gameStatusMap, statusMaps } = useStatusMaps()
   const { setRoundScore } = useGameScore()
   const { setSessionScore } = useSessionScore()
+  const { setGameSummary } = useGameSummary()
+  const { totalGameScore } = useGameScore()
 
   const isGameOver = currentGameState === GAME_STATE.GAME_END
   const hasFullInput =
@@ -89,12 +101,18 @@ export const InputRow = ({ row, isCurrentRound }) => {
             currentRound,
             gameStatusMap,
           })
-
-        setGuess(userInput, Object.values(userInput))
+        setLettersUsed(Object.values(userInput))
         setRoundScore(score)
         setStatusMaps(statusMap, newGameStatusMap)
 
         if (isGameOver) {
+          const lastTimeStamp = timeStamps[timeStamps.length - 1]
+          const displayTime = `${lastTimeStamp.minutes}:${lastTimeStamp.seconds}`
+          setGameSummary({
+            score: totalGameScore,
+            round: currentGameNumber,
+            time: displayTime,
+          })
           if (currentGameNumber < settings.NUMBER_OF_GAMES_PER_DAY) {
             setNewGame()
           }
@@ -123,7 +141,7 @@ export const InputRow = ({ row, isCurrentRound }) => {
           value={getInputValue({
             userInput,
             isCurrentRound,
-            currentRound,
+            row,
             index,
             userGuesses,
           })}

@@ -3,7 +3,7 @@ import { GameSummary } from '../../store/scordle/types'
 import styles from './StartModal.module.scss'
 
 interface IScoreTable {
-  rounds: GameSummary[]
+  games: GameSummary[]
   totalRounds: number
   currentRound: number
 }
@@ -15,14 +15,14 @@ const DEFAULT_ROUND: GameSummary = {
 }
 
 export const ScoreTable: React.FC<IScoreTable> = ({
-  rounds,
+  games,
   totalRounds,
   currentRound,
 }) => {
-  const hasSummaries = rounds.length
+  const hasSummaries = games.length
   let roundSummaries
   if (hasSummaries) {
-    roundSummaries = rounds
+    roundSummaries = games
   } else {
     const defaultSummaries = new Array(totalRounds).fill(DEFAULT_ROUND)
     roundSummaries = defaultSummaries.map((defaultSummary, index) => ({

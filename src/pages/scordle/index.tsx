@@ -6,8 +6,12 @@ import { LettersUsed } from '../../components/LettersUsed'
 import { ScoreCard } from '../../components/ScoreCard'
 import {
   useGame,
+  useGameScore,
+  useGameSummary,
   usePlayerGuesses,
   useSession,
+  useStatusMaps,
+  useTimeStamp,
   useWords,
 } from '../../store/scordle'
 import { StartModal } from '../../components/StartModal'
@@ -23,28 +27,32 @@ const gameWord3 = words[Math.floor(Math.random() * words.length)].toUpperCase()
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(true)
+  const { timeStamps } = useTimeStamp()
   const { currentGameState, resetGame } = useGame()
   const { words, setWords } = useWords()
   const { reset: resetGuesses } = usePlayerGuesses()
+  const { reset: resetStatusMaps } = useStatusMaps()
+  const { reset: resetGameScore } = useGameScore()
 
   const resetState = () => {
     resetGuesses()
     resetGame()
+    resetGameScore()
+    resetStatusMaps()
     setIsOpen(true)
   }
 
   useEffect(() => {
     if (!words.length) {
-      console.log('new words run deep')
       setWords([gameWord1, gameWord2, gameWord3])
     }
   }, [words])
 
   useEffect(() => {
-    if (currentGameState === GAME_STATE.GAME_END) {
+    if (currentGameState === GAME_STATE.GAME_END && timeStamps.length) {
       setTimeout(resetState, 2000)
     }
-  }, [currentGameState])
+  }, [currentGameState, timeStamps])
 
   const onClose = () => {
     setIsOpen(false)
