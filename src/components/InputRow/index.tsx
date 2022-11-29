@@ -10,7 +10,7 @@ import {
   useStatusMaps,
   useTimeStamp,
 } from '../../store/scordle'
-import { GAME_STATE } from '../../store/scordle/types'
+import { GAME_STATE, SESSION_STATE } from '../../store/scordle/types'
 import { LetterInput } from '../LetterInput'
 import styles from './InputRow.module.scss'
 import words from '../../words.json'
@@ -55,7 +55,7 @@ export const InputRow = ({ row, isCurrentRound }) => {
     4: fifthRef,
   }
   const { userGuesses, setGuess, setLettersUsed } = usePlayerGuesses()
-  const { setNewGame, currentGameNumber } = useSession()
+  const { setNewGame, currentGameNumber, setCurrentSessionState } = useSession()
 
   const userInput = userGuesses[row]
 
@@ -75,8 +75,6 @@ export const InputRow = ({ row, isCurrentRound }) => {
   const { setStatusMaps, gameStatusMap, statusMaps } = useStatusMaps()
   const { setRoundScore } = useGameScore()
   const { setSessionScore } = useSessionScore()
-  const { setGameSummary } = useGameSummary()
-  const { totalGameScore } = useGameScore()
 
   const isGameOver = currentGameState === GAME_STATE.GAME_END
   const hasFullInput =
@@ -106,15 +104,10 @@ export const InputRow = ({ row, isCurrentRound }) => {
         setStatusMaps(statusMap, newGameStatusMap)
 
         if (isGameOver) {
-          const lastTimeStamp = timeStamps[timeStamps.length - 1]
-          const displayTime = `${lastTimeStamp.minutes}:${lastTimeStamp.seconds}`
-          setGameSummary({
-            score: totalGameScore,
-            round: currentGameNumber,
-            time: displayTime,
-          })
-          if (currentGameNumber < settings.NUMBER_OF_GAMES_PER_DAY) {
+          if (currentGameNumber + 1 < settings.NUMBER_OF_GAMES_PER_DAY) {
             setNewGame()
+          } else {
+            setCurrentSessionState(SESSION_STATE.ENDED)
           }
           setSessionScore(score)
           setGameState(GAME_STATE.GAME_END)
